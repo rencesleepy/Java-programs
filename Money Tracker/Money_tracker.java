@@ -2,15 +2,24 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-public class Money_tracker {
+public class Money_tracker_organized {
     public static void main(String[] args) {
+        // 1. MAIN WINDOW
         JFrame MAIN_INTERFACE = new JFrame();
-        MAIN_INTERFACE.getContentPane().setBackground(Color.decode("#101827")); // main window
+        MAIN_INTERFACE.setTitle("Money Tracker");
+        MAIN_INTERFACE.setSize(1100, 800);
+        MAIN_INTERFACE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        MAIN_INTERFACE.setLocationRelativeTo(null);
+        MAIN_INTERFACE.setLayout(null);
+        MAIN_INTERFACE.getContentPane().setBackground(Color.decode("#101827"));
 
+        // 2. LABELS AND AMOUNTS
         JLabel MyWallet = new JLabel("My Wallet");
         MyWallet.setFont(new Font("Segoe UI", Font.BOLD, 35));
         MyWallet.setForeground(Color.WHITE);
@@ -47,6 +56,7 @@ public class Money_tracker {
         expenses_amount.setBounds(25, 33, 300, 50);
         //-------------------------------------------------- EXPENSES MONEY
 
+        // 3. ROUNDED CARDS
         JPanel expenses_card = new JPanel() {
             @Override
             protected void paintComponent(java.awt.Graphics g5) {
@@ -125,32 +135,23 @@ public class Money_tracker {
 
             g2.dispose();
             }
-        }; 
+        };
 
-        //-------------------------------- CARDS
+        // 4. CARD POSITIONS AND STYLES
+
+        box_card.setOpaque(false);
+        income_card.setOpaque(false);
+        expenses_card.setOpaque(false);
+
         box_card.setBounds(35, 110, 1000, 150);
-        box_card.setLayout(null);
-        box_card.setBackground(Color.decode("#1E293B"));
-
         income_card.setBounds(35, 280, 480, 100);
-        income_card.setLayout(null);
-        income_card.setBackground(Color.decode("#1E293B"));
-
         expenses_card.setBounds(535, 280, 500, 100);
+
+        box_card.setLayout(null);
+        income_card.setLayout(null);
         expenses_card.setLayout(null);
-        expenses_card.setBackground(Color.decode("#1E293B"));
 
-        //---------------------------------
-
-        income_card.add(income);
-        income_card.add(income_amount);
-
-        MAIN_INTERFACE.setTitle("Money Tracker");
-        MAIN_INTERFACE.setSize(1100, 800);
-        MAIN_INTERFACE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        MAIN_INTERFACE.setLocationRelativeTo(null);
-        MAIN_INTERFACE.setLayout(null);
-
+        // 5. LABEL POSITIONS
         MyWallet.setBounds(50, 30, 300, 50);
         total_balance.setBounds(25, 15, 300, 40);
         amount.setBounds(25, 50, 400, 50);
@@ -158,20 +159,7 @@ public class Money_tracker {
         income.setBounds(25, 1, 300, 40);
         expenses.setBounds(25, 1, 300, 40);
 
-        expenses_card.add(expenses);
-        expenses_card.add(expenses_amount);
-
-        MAIN_INTERFACE.add(MyWallet);
-        MAIN_INTERFACE.add(box_card);
-        MAIN_INTERFACE.add(expenses_card);
-        MAIN_INTERFACE.add(income_card);
-
-        box_card.add(total_balance);
-        box_card.add(amount);
-        box_card.add(available_balance);
-
-        //---------------------------------- lower panels
-
+        // 6. LOWER PANELS
         JLabel breakdown = new JLabel("Total spending breakdown");
         breakdown.setFont(new Font("Segoe UI", Font.BOLD, 20));
         breakdown.setForeground(Color.WHITE);
@@ -180,7 +168,7 @@ public class Money_tracker {
         JLabel recent_transactions = new JLabel("Recent Transactions");
         recent_transactions.setFont(new Font("Segoe UI", Font.BOLD, 20));
         recent_transactions.setForeground(Color.WHITE);
-        recent_transactions.setBounds(20, 10, 400, 40);
+        recent_transactions.setBounds(20, 10, 260, 40);
 
         JPanel chart = new JPanel() {
             @Override
@@ -202,9 +190,6 @@ public class Money_tracker {
             g6.dispose();
             }
         };
-        chart.setBounds(35, 400, 670, 340);
-        chart.setBackground(Color.decode("#1E293B"));
-
         JPanel recents = new JPanel() {
             @Override
             protected void paintComponent(java.awt.Graphics g8) {
@@ -225,7 +210,17 @@ public class Money_tracker {
             g9.dispose();
             }
         };
+        chart.setBounds(35, 400, 670, 340);
+        chart.setBackground(Color.decode("#1E293B"));
+        chart.setLayout(null);
+        chart.setOpaque(false);
 
+        recents.setBounds(730, 400, 300, 340);
+        recents.setBackground(Color.decode("#1E293B"));
+        recents.setLayout(null);
+        recents.setOpaque(false);
+
+        // 7. ADD TRANSACTION BUTTON
         JButton transaction_process = new JButton("+ Add Transaction") {
             @Override
             protected void paintComponent(java.awt.Graphics g10) {
@@ -244,6 +239,7 @@ public class Money_tracker {
                     getWidth(), getHeight(),
                     25, 25
                 );
+                g11.dispose();
                 super.paintComponent(g10);
             }
         };
@@ -255,32 +251,218 @@ public class Money_tracker {
         transaction_process.setContentAreaFilled(false);
         transaction_process.setOpaque(false);
         transaction_process.setBorderPainted(false);
-        transaction_process.addActionListener(e -> {
-            System.out.println("responded");
+
+
+        // 8. TRANSACTION FORM
+        JDialog transaction_form = new JDialog(
+            MAIN_INTERFACE, 
+            "Add Transaction", 
+            true
+        );
+        transaction_form.setSize(1070, 650);
+        transaction_form.setLocationRelativeTo(MAIN_INTERFACE);
+        transaction_form.setLayout(null);
+        transaction_form.getContentPane().setBackground(Color.decode("#101827"));
+
+        JLabel newtransaction_text = new JLabel("New transaction");
+        newtransaction_text.setBounds(40, 30, 400, 30);
+        newtransaction_text.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        newtransaction_text.setForeground(Color.WHITE);
+        transaction_form.add(newtransaction_text);
+
+        JLabel transaction_type = new JLabel("Type of transaction");
+        transaction_type.setBounds(40, 65, 400, 30);
+        transaction_type.setFont(new Font ("Segoe UI", Font.PLAIN, 16));
+        transaction_type.setForeground(Color.WHITE);
+        transaction_form.add(transaction_type);
+
+        JPanel transactionform_border = new JPanel() {
+            @Override
+            protected void paintComponent(java.awt.Graphics g15) {
+                java.awt.Graphics2D g16 = (java.awt.Graphics2D) g15.create();
+
+                g16.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON  
+                );
+
+                GradientPaint gradient_expenses = new GradientPaint(
+                    0, 0, Color.decode("#3b4857"), 
+                    getWidth(), getHeight(), Color.decode("#292c42")
+                );
+                g16.setPaint(gradient_expenses);
+
+                g16.fillRoundRect(
+                    0, 0, 
+                    getWidth(), getHeight(),
+                    25, 25
+                );
+                g16.dispose();
+            }
+        };
+            transactionform_border.setBounds(20, 20, 1015, 575);
+            transactionform_border.setLayout(null);
+            transactionform_border.setOpaque(false);
+
+            transaction_form.add(transactionform_border);
+
+            transaction_process.addActionListener(e -> {
+                transaction_form.setVisible(true);     
         });
 
-        recents.setBounds(730, 400, 300, 340);
-        recents.setBackground(Color.decode("#1E293B"));
+        JButton income_record = new JButton("+ Income") { // INCOME CLICK
+            @Override 
+            protected void paintComponent(java.awt.Graphics g17) {
+                java.awt.Graphics2D g18 = (java.awt.Graphics2D) g17.create();
 
+                g18.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+                
+                g18.setColor(getBackground());
+                g18.fillRoundRect(
+                    0, 0,
+                    getWidth(), getHeight(),
+                    25, 25
+                );
+                super.paintComponent(g17);
+            }
+        };
+        income_record.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        income_record.setBackground(Color.decode("#1ea00d"));
+        income_record.setForeground(Color.WHITE);
+        income_record.setFocusPainted(false);
+        income_record.setBounds(10, 80, 490, 45);
+        income_record.setContentAreaFilled(false);
+        income_record.setOpaque(false);
+        income_record.setBorderPainted(false);
+        income_record.addActionListener(e -> {
+            System.out.println("INCOME RECORDED");
+        });
+
+        transactionform_border.add(income_record);
+
+        JButton expense_record = new JButton("+ Expense") { // EXPENSE CLICK
+            @Override 
+            protected void paintComponent(java.awt.Graphics g19) {
+                java.awt.Graphics2D g20 = (java.awt.Graphics2D) g19.create();
+
+                g20.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+
+                g20.setColor(getBackground());
+                g20.fillRoundRect(
+                    0, 0, 
+                    getWidth(), getHeight(), 
+                    25, 25
+                );
+                super.paintComponent(g19);
+            }
+        };
+        expense_record.setFont(new Font("Segoe UI" , Font.BOLD, 15));
+        expense_record.setBackground(Color.decode("#a00d0d"));
+        expense_record.setForeground(Color.WHITE);
+        expense_record.setFocusPainted(false);
+        expense_record.setBounds(510, 80, 490, 45);
+        expense_record.setContentAreaFilled(false);
+        expense_record.setBorderPainted(false);
+        expense_record.addActionListener(e -> {
+            System.out.println("EXPENSE RECORDED");
+        });
+
+        transactionform_border.add(expense_record);
+
+        // 8.1 INPUTS
+        JLabel description_label = new JLabel("Description");
+        description_label.setForeground(Color.WHITE);
+        description_label.setBounds(25, 145, 250, 30);
+        transactionform_border.add(description_label);
+
+        JLabel amount_label = new JLabel("Amount");
+        amount_label.setForeground(Color.WHITE);
+        amount_label.setBounds(25, 230, 250, 30);
+        transactionform_border.add(amount_label);
+
+        JTextField description_input = new JTextField() {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g21) {
+                java.awt.Graphics2D g22 = (java.awt.Graphics2D) g21.create();
+                g22.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+                g22.setColor(getBackground());
+                g22.fillRoundRect(
+                    0, 0, 
+                    getWidth(), getHeight(), 
+                    25, 25
+                );
+                super.paintComponent(g21);
+            }
+        };
+        
+        description_input.setFont (new Font("Segoe UI", Font.PLAIN, 16));
+        description_input.setBounds(20, 180, 970, 40);
+        description_input.setBackground(Color.decode("#626f77"));
+        description_input.setOpaque(false);
+        description_input.setBorder(
+            javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 15)
+        );
+
+        JTextField AmountSet = new JTextField() {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g23) {
+                java.awt.Graphics2D g24 = (java.awt.Graphics2D) g23.create();
+                g24.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+
+                g24.setColor(getBackground());
+                g24.fillRoundRect(
+                    0, 0, 
+                    getWidth(), getHeight(), 
+                    25, 25
+                );
+                super.paintComponent(g23);
+            }
+        };
+
+        AmountSet.setFont (new Font("Segoe UI", Font.PLAIN, 16));
+        AmountSet.setBounds(20, 260, 970, 40);
+        AmountSet.setBackground(Color.decode("#626f77"));
+        AmountSet.setOpaque(false);
+        AmountSet.setBorder(
+            javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 15)
+        );
+
+        transactionform_border.add(AmountSet);
+        transactionform_border.add(description_input);
+
+        // 9. ADD COMPONENTS TO THEIR CONTAINERS
+        box_card.add(total_balance);
+        box_card.add(amount);
+        box_card.add(available_balance);
+        income_card.add(income);
+        income_card.add(income_amount);
+        expenses_card.add(expenses);
+        expenses_card.add(expenses_amount);
         chart.add(breakdown);
-        chart.setLayout(null);
-
         recents.add(recent_transactions);
-        recents.setLayout(null);
 
+        MAIN_INTERFACE.add(MyWallet);
+        MAIN_INTERFACE.add(box_card);
+        MAIN_INTERFACE.add(income_card);
+        MAIN_INTERFACE.add(expenses_card);
         MAIN_INTERFACE.add(chart);
         MAIN_INTERFACE.add(recents);
-        
-        box_card.setOpaque(false);
-        income_card.setOpaque(false);
-        expenses_card.setOpaque(false);
-        chart.setOpaque(false);
-        recents.setOpaque(false);
-
-
         MAIN_INTERFACE.add(transaction_process);
-        MAIN_INTERFACE.setVisible(true);
 
-        System.out.println("SUCESSFULL EXECUTION!");
+        // 10. DISPLAY WINDOW
+        MAIN_INTERFACE.setVisible(true);
+        System.out.println("SUCCESSFUL EXECUTION!");
     }
 }
