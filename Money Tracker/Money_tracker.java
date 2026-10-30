@@ -5,6 +5,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -17,16 +18,17 @@ public class Money_tracker_organized {
         MAIN_INTERFACE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         MAIN_INTERFACE.setLocationRelativeTo(null);
         MAIN_INTERFACE.setLayout(null);
-        MAIN_INTERFACE.getContentPane().setBackground(Color.decode("#101827"));
+        MAIN_INTERFACE.getContentPane().setBackground(Color.decode("#F1F5F9"));
 
         // 2. LABELS AND AMOUNTS
         JLabel MyWallet = new JLabel("My Wallet");
         MyWallet.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        MyWallet.setForeground(Color.WHITE);
+        MyWallet.setForeground(Color.decode("#0F172A"));
+        
 
         JLabel total_balance = new JLabel("Total Balance");
         total_balance.setFont(new Font("Segoe UI", Font.PLAIN, 25)); 
-        total_balance.setForeground(Color.WHITE);
+        total_balance.setForeground(Color.decode("#E0E7FF"));
 
         JLabel amount = new JLabel("-------------");
         amount.setFont(new Font("Segoe UI", Font.BOLD, 30)); // yung mismong pera
@@ -34,25 +36,25 @@ public class Money_tracker_organized {
 
         JLabel available_balance = new JLabel("Available Balance");
         available_balance.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        available_balance.setForeground(Color.decode("#4ADE80"));
+        available_balance.setForeground(Color.decode("#BBF7D0"));
 
-        JLabel income = new JLabel("Income");
-        income.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        income.setForeground(Color.decode("#4ADE80"));
+        JLabel income = new JLabel("\u2197 Income");
+        income.setFont(new Font("Segoe UI Symbol", Font.BOLD, 20));
+        income.setForeground(Color.decode("#166534"));
 
-        JLabel expenses = new JLabel("Expenses");
-        expenses.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        expenses.setForeground(Color.decode("#FCA5A5"));
+        JLabel expenses = new JLabel("↘ Expenses");
+        expenses.setFont(new Font("Segoe UI Symbol", Font.BOLD, 20));
+        expenses.setForeground(Color.decode("#991B1B"));
 
         //-------------------------------------------------- INCOME MONEY
         JLabel income_amount = new JLabel("₱0.00");
         income_amount.setFont(new Font("Segoe UI", Font.BOLD, 25));
-        income_amount.setForeground(Color.WHITE);
+        income_amount.setForeground(Color.decode("#166534"));
         income_amount.setBounds(25, 33, 300, 50);
 
         JLabel expenses_amount = new JLabel("₱0.00");
         expenses_amount.setFont(new Font("Segoe UI", Font.BOLD, 25));
-        expenses_amount.setForeground(Color.WHITE);
+        expenses_amount.setForeground(Color.decode("#991B1B"));
         expenses_amount.setBounds(25, 33, 300, 50);
         //-------------------------------------------------- EXPENSES MONEY
 
@@ -68,8 +70,8 @@ public class Money_tracker_organized {
                 );
 
                 GradientPaint gradient_expenses = new GradientPaint (
-                0, 0, Color.decode("#693B4A"), 
-                getWidth(), getHeight(), Color.decode("#35212D")
+                0, 0, Color.decode("#FEE2E2"), 
+                getWidth(), getHeight(), Color.decode("#FECACA")
             );
 
                 g4.setPaint(gradient_expenses);
@@ -77,6 +79,15 @@ public class Money_tracker_organized {
                 g4.fillRoundRect(
                     0, 0, 
                     getWidth(), getHeight(), 
+                    25, 25
+                );
+
+                // border ng expense
+                g4.setColor(Color.decode("#CBD5E1"));
+                g4.setStroke(new java.awt.BasicStroke(2));
+                g4.drawRoundRect(
+                    1, 1, 
+                    getWidth() -3, getHeight() -3, 
                     25, 25
                 );
             g4.dispose();
@@ -95,8 +106,8 @@ public class Money_tracker_organized {
                 );
 
                 GradientPaint gradient_income = new GradientPaint (
-                0, 0, Color.decode("#20594B"), 
-                getWidth(), getHeight(), Color.decode("#102F2B")
+                0, 0, Color.decode("#DCFCE7"), 
+                getWidth(), getHeight(), Color.decode("#BBF7D0")
             );
 
                 g3.setPaint(gradient_income);
@@ -104,6 +115,15 @@ public class Money_tracker_organized {
                 g3.fillRoundRect(
                     0, 0, 
                     getWidth(), getHeight(), 
+                    25, 25
+                );
+
+                // border delkjfdaeda
+                g3.setColor(Color.decode("#CBD5E1"));
+                g3.setStroke(new java.awt.BasicStroke(2));
+                g3.drawRoundRect(
+                    1, 1, 
+                    getWidth() -3, getHeight() -3, 
                     25, 25
                 );
             g3.dispose();
@@ -121,22 +141,30 @@ public class Money_tracker_organized {
                 );
 
             GradientPaint gradient = new GradientPaint (
-                0, 0, Color.decode("#315A9C"), 
-                getWidth(), getHeight(), Color.decode("#4a525f")
+                0, 0, Color.decode("#4F46E5"), 
+                getWidth(), getHeight(), Color.decode("#2563EB")
             );
 
-                g2.setPaint(gradient);
+                g2.setPaint(gradient); 
 
                 g2.fillRoundRect(
-                    0, 0, // null to
-                    getWidth(), getHeight(),
+                    1, 1, // null to
+                    getWidth() -3 , getHeight() -3,
+                    25, 25
+                );
+                // border frfrfrfrfr
+                g2.setColor(Color.decode("#CBD5E1"));
+                g2.setStroke(new java.awt.BasicStroke(2));
+                g2.drawRoundRect(
+                    1, 1, 
+                    getWidth() -3, getHeight() -3,
                     25, 25
                 );
 
             g2.dispose();
             }
         };
-
+        
         // 4. CARD POSITIONS AND STYLES
 
         box_card.setOpaque(false);
@@ -160,14 +188,60 @@ public class Money_tracker_organized {
         expenses.setBounds(25, 1, 300, 40);
 
         // 6. LOWER PANELS
+
+        JPanel spending_chart = new JPanel() {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g) {
+                super.paintComponent(g);
+
+                java.awt.Graphics2D g2 = 
+                (java.awt.Graphics2D) g.create();
+                g2.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+                int[] percentages = {40, 20, 30, 10}; // pansamantala
+                Color[] colors = { 
+                    Color.decode("#4F46E5"),
+                    Color.decode("#F59E0B"),
+                    Color.decode("#10B981"),
+                    Color.decode("#F43F5E")
+                };
+                int startAngle = 90;
+                for (int i=0; i < percentages.length; i++) {
+                    int angle = percentages[i] * 300 / 100;
+                    g2.setColor(colors[i]);
+                    g2.fillArc(30, 15, 200, 200, startAngle, -angle);
+                    startAngle -= angle;
+                }
+                // hole
+                g2.setColor(Color.WHITE);
+                g2.fillOval(85, 70, 90, 90);
+                g2.dispose();
+            }
+        };
+
+        spending_chart.setBounds(20, 90, 300, 240);
+        spending_chart.setOpaque(false);
+
+        JLabel breakdown_statement = new JLabel("No spending data yet");
+        breakdown_statement.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        breakdown_statement.setForeground(Color.GRAY);
+        breakdown_statement.setBounds(22, 50, 200, 40);
+
+        JLabel recent_transactions_statement = new JLabel("No transactions");
+        recent_transactions_statement.setFont(new Font("Segoe UI" , Font.PLAIN, 15));
+        recent_transactions_statement.setForeground(Color.GRAY);
+        recent_transactions_statement.setBounds(22, 50, 200, 40);
+
         JLabel breakdown = new JLabel("Total spending breakdown");
         breakdown.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        breakdown.setForeground(Color.WHITE);
+        breakdown.setForeground(Color.BLACK);
         breakdown.setBounds(20, 10, 400, 40);
 
         JLabel recent_transactions = new JLabel("Recent Transactions");
         recent_transactions.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        recent_transactions.setForeground(Color.WHITE);
+        recent_transactions.setForeground(Color.BLACK);
         recent_transactions.setBounds(20, 10, 260, 40);
 
         JPanel chart = new JPanel() {
@@ -183,8 +257,16 @@ public class Money_tracker_organized {
                 g6.setColor(getBackground());
 
                 g6.fillRoundRect(
-                    0, 0, 
-                    getWidth(), getHeight(), 
+                    1, 1, 
+                    getWidth() -3, getHeight() -3, 
+                    25, 25
+                );
+
+                g6.setColor(Color.decode("#CBD5E1"));
+                g6.setStroke(new java.awt.BasicStroke(2));
+                g6.drawRoundRect(
+                    1, 1,
+                    getWidth() -3, getHeight() -3,
                     25, 25
                 );
             g6.dispose();
@@ -203,20 +285,28 @@ public class Money_tracker_organized {
                 g9.setColor(getBackground());
 
                 g9.fillRoundRect(
-                    0, 0, 
+                    1, 1, 
                     getWidth(), getHeight(),
+                    25, 25
+                );
+
+                g9.setColor(Color.decode("#CBD5E1"));
+                g9.setStroke(new java.awt.BasicStroke(2));
+                g9.drawRoundRect(
+                    1, 1, 
+                    getWidth() -3, getHeight() -3, 
                     25, 25
                 );
             g9.dispose();
             }
         };
         chart.setBounds(35, 400, 670, 340);
-        chart.setBackground(Color.decode("#1E293B"));
+        chart.setBackground(Color.decode("#ffffff"));
         chart.setLayout(null);
         chart.setOpaque(false);
 
         recents.setBounds(730, 400, 300, 340);
-        recents.setBackground(Color.decode("#1E293B"));
+        recents.setBackground(Color.decode("#ffffff"));
         recents.setLayout(null);
         recents.setOpaque(false);
 
@@ -244,7 +334,7 @@ public class Money_tracker_organized {
             }
         };
         transaction_process.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        transaction_process.setBackground(Color.decode("#2563EB"));
+        transaction_process.setBackground(Color.decode("#4F46E5"));
         transaction_process.setForeground(Color.WHITE);
         transaction_process.setFocusPainted(false);
         transaction_process.setBounds(830, 35, 205, 45);
@@ -262,18 +352,18 @@ public class Money_tracker_organized {
         transaction_form.setSize(1070, 650);
         transaction_form.setLocationRelativeTo(MAIN_INTERFACE);
         transaction_form.setLayout(null);
-        transaction_form.getContentPane().setBackground(Color.decode("#101827"));
+        transaction_form.getContentPane().setBackground(Color.decode("#F8FAFC"));
 
         JLabel newtransaction_text = new JLabel("New transaction");
         newtransaction_text.setBounds(40, 30, 400, 30);
         newtransaction_text.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        newtransaction_text.setForeground(Color.WHITE);
+        newtransaction_text.setForeground(Color.decode("#0F172A"));
         transaction_form.add(newtransaction_text);
 
         JLabel transaction_type = new JLabel("Type of transaction");
         transaction_type.setBounds(40, 65, 400, 30);
         transaction_type.setFont(new Font ("Segoe UI", Font.PLAIN, 16));
-        transaction_type.setForeground(Color.WHITE);
+        transaction_type.setForeground(Color.decode("#0F172A"));
         transaction_form.add(transaction_type);
 
         JPanel transactionform_border = new JPanel() {
@@ -287,14 +377,22 @@ public class Money_tracker_organized {
                 );
 
                 GradientPaint gradient_expenses = new GradientPaint(
-                    0, 0, Color.decode("#3b4857"), 
-                    getWidth(), getHeight(), Color.decode("#292c42")
+                    0, 0, Color.decode("#F1F5F9"), 
+                    getWidth(), getHeight(), Color.decode("#F1F5F9")
                 );
                 g16.setPaint(gradient_expenses);
 
                 g16.fillRoundRect(
                     0, 0, 
                     getWidth(), getHeight(),
+                    25, 25
+                );
+
+                g16.setColor(Color.decode("#CBD5E1"));
+                g16.setStroke(new java.awt.BasicStroke(2));
+                g16.drawRoundRect(
+                    1, 1, 
+                    getWidth() -3, getHeight() -3, 
                     25, 25
                 );
                 g16.dispose();
@@ -330,7 +428,7 @@ public class Money_tracker_organized {
             }
         };
         income_record.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        income_record.setBackground(Color.decode("#1ea00d"));
+        income_record.setBackground(Color.decode("#15803D"));
         income_record.setForeground(Color.WHITE);
         income_record.setFocusPainted(false);
         income_record.setBounds(10, 80, 490, 45);
@@ -363,7 +461,7 @@ public class Money_tracker_organized {
             }
         };
         expense_record.setFont(new Font("Segoe UI" , Font.BOLD, 15));
-        expense_record.setBackground(Color.decode("#a00d0d"));
+        expense_record.setBackground(Color.decode("#B91C1C"));
         expense_record.setForeground(Color.WHITE);
         expense_record.setFocusPainted(false);
         expense_record.setBounds(510, 80, 490, 45);
@@ -377,15 +475,21 @@ public class Money_tracker_organized {
 
         // 8.1 INPUTS
         JLabel description_label = new JLabel("Description");
-        description_label.setForeground(Color.WHITE);
+        description_label.setForeground(Color.decode("#0F172A"));
         description_label.setBounds(25, 145, 250, 30);
         transactionform_border.add(description_label);
 
         JLabel amount_label = new JLabel("Amount");
-        amount_label.setForeground(Color.WHITE);
+        amount_label.setForeground(Color.decode("#0F172A"));
         amount_label.setBounds(25, 230, 250, 30);
         transactionform_border.add(amount_label);
 
+        JLabel category_label = new JLabel("Category");
+        category_label.setForeground(Color.decode("#0F172A"));
+        category_label.setBounds(25, 315, 250, 30);
+        transactionform_border.add(category_label);
+
+        // description
         JTextField description_input = new JTextField() {
             @Override 
             protected void paintComponent(java.awt.Graphics g21) {
@@ -403,15 +507,45 @@ public class Money_tracker_organized {
                 super.paintComponent(g21);
             }
         };
-        
         description_input.setFont (new Font("Segoe UI", Font.PLAIN, 16));
         description_input.setBounds(20, 180, 970, 40);
-        description_input.setBackground(Color.decode("#626f77"));
+        description_input.setBackground(Color.decode("#E2E8F0"));
+        description_input.setForeground(Color.decode("#0F172A"));
         description_input.setOpaque(false);
         description_input.setBorder(
             javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 15)
+        ); 
+
+        // ------------- cateogyr
+        JTextField CategorySet = new JTextField() {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g25) {
+                java.awt.Graphics2D g26 = (java.awt.Graphics2D) g25.create();
+                g26.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+                
+                g26.setColor(getBackground());
+                g26.fillRoundRect(
+                    0, 0, 
+                    getWidth(), getHeight(),
+                    25, 25
+                );
+                super.paintComponent(g25);
+            }
+        };
+        
+        CategorySet.setFont(new Font("Segoe UI" , Font.PLAIN, 16));
+        CategorySet.setBounds(20, 345, 970, 40);
+        CategorySet.setBackground(Color.decode("#E2E8F0"));
+        CategorySet.setForeground(Color.decode("#0F172A"));
+        CategorySet.setOpaque(false);
+        CategorySet.setBorder(
+            javax.swing.BorderFactory.createEmptyBorder (0, 15, 0 , 15)
         );
 
+         // ----- amount
         JTextField AmountSet = new JTextField() {
             @Override 
             protected void paintComponent(java.awt.Graphics g23) {
@@ -433,14 +567,105 @@ public class Money_tracker_organized {
 
         AmountSet.setFont (new Font("Segoe UI", Font.PLAIN, 16));
         AmountSet.setBounds(20, 260, 970, 40);
-        AmountSet.setBackground(Color.decode("#626f77"));
+        AmountSet.setBackground(Color.decode("#E2E8F0"));
+        AmountSet.setForeground(Color.decode("#0F172A"));
         AmountSet.setOpaque(false);
         AmountSet.setBorder(
             javax.swing.BorderFactory.createEmptyBorder(0, 15, 0, 15)
         );
 
-        transactionform_border.add(AmountSet);
+        // --- save transaction button
+        JButton save_transaction = new JButton("Save transaction") {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g27) {
+                java.awt.Graphics2D g28 = (java.awt.Graphics2D) g27.create();
+                g28.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+                g28.setColor(getBackground());
+                g28.fillRoundRect(
+                    0, 0,
+                    getWidth(), getHeight(),
+                    25, 25
+                );
+                super.paintComponent(g27);
+            }
+        };
+
+        save_transaction.setFont (new Font("Segoe UI", Font.BOLD, 16));
+        save_transaction.setBackground(Color.decode("#4F46E5"));
+        save_transaction.setForeground(Color.white);
+        save_transaction.setFocusPainted(false);
+        save_transaction.setBounds(20, 410, 970, 80);
+        save_transaction.setContentAreaFilled(false);
+        save_transaction.setOpaque(false);
+        save_transaction.setBorderPainted(false);
+        save_transaction.addActionListener(e -> {
+            String description = description_input.getText();
+            String amountstr = AmountSet.getText();
+            String category = CategorySet.getText();
+
+            System.out.println("Description: " + description);
+            System.out.println("Amount: " + amountstr);
+            System.out.println("Category: " + category);
+
+            if (description.trim().isEmpty() || 
+                amountstr.trim().isEmpty() || 
+                category.trim().isEmpty()
+            )
+            {
+                JOptionPane.showMessageDialog(
+                    transaction_form, 
+                    "Please fill in the blanks" , 
+                    "Input error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+        });
+
+        JButton add_transaction_back = new JButton("← Back") {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g30) {
+                java.awt.Graphics2D g31 = (java.awt.Graphics2D) g30.create();
+
+                g31.setRenderingHint (
+                java.awt.RenderingHints.KEY_ANTIALIASING, 
+                java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+            );
+
+            g31.setColor(getBackground());
+            g31.fillRoundRect(
+                0, 0, 
+                getWidth(), getHeight(), 
+                25, 25
+            );
+            g31.dispose();
+            super.paintComponent(g30);
+            }
+        };
+        add_transaction_back.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        add_transaction_back.setBackground(Color.decode("#4F46E5"));
+        add_transaction_back.setForeground(Color.WHITE);
+        add_transaction_back.setFocusPainted(false);
+        add_transaction_back.setBounds(900, 25, 100, 40);
+        add_transaction_back.setContentAreaFilled(false);
+        add_transaction_back.setOpaque(false);
+        add_transaction_back.setBorderPainted(false);
+        add_transaction_back.addActionListener(e -> {
+            transaction_form.setVisible(false);           
+        });
+
+        transactionform_border.add(add_transaction_back);
+
         transactionform_border.add(description_input);
+        transactionform_border.add(AmountSet);
+        transactionform_border.add(CategorySet);
+        transactionform_border.add(save_transaction);
+
+        // 8.2 DONUT
+        
 
         // 9. ADD COMPONENTS TO THEIR CONTAINERS
         box_card.add(total_balance);
@@ -451,6 +676,10 @@ public class Money_tracker_organized {
         expenses_card.add(expenses);
         expenses_card.add(expenses_amount);
         chart.add(breakdown);
+        chart.add(breakdown_statement);
+        chart.add(spending_chart);
+        chart.setLayout(null);
+        recents.add(recent_transactions_statement);
         recents.add(recent_transactions);
 
         MAIN_INTERFACE.add(MyWallet);
@@ -463,6 +692,9 @@ public class Money_tracker_organized {
 
         // 10. DISPLAY WINDOW
         MAIN_INTERFACE.setVisible(true);
-        System.out.println("SUCCESSFUL EXECUTION!");
+        for (int i=0; i<5; i++)
+        {
+            System.out.println("SUCCESSFUL EXECUTION!");
+        }
     }
 }
