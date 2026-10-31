@@ -11,6 +11,11 @@ import javax.swing.JTextField;
 
 public class Money_tracker_organized {
     public static void main(String[] args) {
+
+        //connector
+        Transaction_manager manager = new Transaction_manager();
+        final String[] selected_type = {"NONE"};
+
         // 1. MAIN WINDOW
         JFrame MAIN_INTERFACE = new JFrame();
         MAIN_INTERFACE.setTitle("Money Tracker");
@@ -244,6 +249,14 @@ public class Money_tracker_organized {
         recent_transactions.setForeground(Color.BLACK);
         recent_transactions.setBounds(20, 10, 260, 40);
 
+        JLabel line_1 = new JLabel("──────────────────────────────────────────────────────────────────────────────────────────────────");
+        line_1.setForeground(Color.GRAY);
+        line_1.setBounds(20, 20, 700, 65);
+
+        JLabel line_2 = new JLabel("─────────────────────────────────────────");
+        line_2.setForeground(Color.GRAY);
+        line_2.setBounds(20, 20, 400, 65);
+
         JPanel chart = new JPanel() {
             @Override
             protected void paintComponent(java.awt.Graphics g7) {
@@ -309,6 +322,13 @@ public class Money_tracker_organized {
         recents.setBackground(Color.decode("#ffffff"));
         recents.setLayout(null);
         recents.setOpaque(false);
+
+
+        JPanel transaction_list = new JPanel();
+        transaction_list.setLayout(null);
+        transaction_list.setOpaque(false);
+        transaction_list.setBounds(15, 60, 270, 260);
+        recents.add(transaction_list);
 
         // 7. ADD TRANSACTION BUTTON
         JButton transaction_process = new JButton("+ Add Transaction") {
@@ -436,7 +456,9 @@ public class Money_tracker_organized {
         income_record.setOpaque(false);
         income_record.setBorderPainted(false);
         income_record.addActionListener(e -> {
-            System.out.println("INCOME RECORDED");
+            selected_type[0] = "INCOME";
+            System.out.println("Selected: " + selected_type[0]);
+
         });
 
         transactionform_border.add(income_record);
@@ -468,12 +490,19 @@ public class Money_tracker_organized {
         expense_record.setContentAreaFilled(false);
         expense_record.setBorderPainted(false);
         expense_record.addActionListener(e -> {
-            System.out.println("EXPENSE RECORDED");
+            selected_type[0] = "EXPENSE";
+            System.out.println("Selected: " + selected_type[0]);
         });
 
         transactionform_border.add(expense_record);
 
         // 8.1 INPUTS
+        JLabel reminders = new JLabel("Make sure to choose type of transaction first before saving");
+        reminders.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        reminders.setForeground(Color.GRAY);
+        reminders.setBounds(275, 500, 450, 30);
+        transactionform_border.add(reminders); 
+
         JLabel description_label = new JLabel("Description");
         description_label.setForeground(Color.decode("#0F172A"));
         description_label.setBounds(25, 145, 250, 30);
@@ -602,6 +631,9 @@ public class Money_tracker_organized {
         save_transaction.setOpaque(false);
         save_transaction.setBorderPainted(false);
         save_transaction.addActionListener(e -> {
+
+            recent_transactions_statement.setText("");
+
             String description = description_input.getText();
             String amountstr = AmountSet.getText();
             String category = CategorySet.getText();
@@ -623,6 +655,70 @@ public class Money_tracker_organized {
                 );
                 return;
             }
+
+            if (amountstr.trim().matches(".*[a-zA-Z]+.*")) {
+                JOptionPane.showMessageDialog(
+                    transaction_form, 
+                    "Please enter a valid amount", 
+                    "Input error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            if (selected_type[0].equals("NONE")) {
+                JOptionPane.showMessageDialog(transaction_form, 
+                    "INCOME AT EXPENSE LANG NGANI!",
+                    "Transaction Type Required", 
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            // VALIDATE AMOUNT
+                double money;
+
+                try {
+                    money = Transaction_manager.validateAmount(amountstr);
+                }
+                catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(
+                        transaction_form,
+                        ex.getMessage(),
+                        "Invalid Amount",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                // CREATE TRANSACTION OBJECT
+                Transaction newTransaction = new Transaction(
+                    selected_type[0],
+                    description.trim(),
+                    category.trim(),
+                    money
+                );
+
+            // SAVE TRANSACTION IN ARRAYLIST
+            manager.addTransaction(newTransaction);
+
+            RecentTransactions.updateList(transaction_list, manager.getTransactions());
+
+            System.out.println("Total transactions: " + manager.getTransactions().size());
+            
+            amount.setText(String.format("₱%,.2f", manager.getBalance()));
+            income_amount.setText(
+                String.format("₱%,.2f", manager.getTotalIncome())
+            );
+
+            expenses_amount.setText(
+                String.format("₱%,.2f", manager.getTotalExpenses())
+            );
+
+
+            System.out.println("Transaction SAVED!!!");
+            System.out.println("Total Income: " + manager.getTotalIncome());
+            System.out.println("Total Expenses: " + manager.getTotalExpenses());
+            System.out.println("Balance: " + manager.getBalance());
         });
 
         JButton add_transaction_back = new JButton("← Back") {
@@ -676,11 +772,13 @@ public class Money_tracker_organized {
         expenses_card.add(expenses);
         expenses_card.add(expenses_amount);
         chart.add(breakdown);
+        chart.add(line_1);
         chart.add(breakdown_statement);
         chart.add(spending_chart);
         chart.setLayout(null);
         recents.add(recent_transactions_statement);
         recents.add(recent_transactions);
+        recents.add(line_2);
 
         MAIN_INTERFACE.add(MyWallet);
         MAIN_INTERFACE.add(box_card);
