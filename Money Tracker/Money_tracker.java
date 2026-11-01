@@ -794,5 +794,8 @@ public class Money_tracker_organized {
         {
             System.out.println("SUCCESSFUL EXECUTION!");
         }
+        System.out.println("----------------------");
+        System.out.println("--- RECENT ACTIONS --- ");
+        System.out.println("----------------------");
     }
 }
