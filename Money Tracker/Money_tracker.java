@@ -564,34 +564,28 @@ public class Money_tracker_organized {
                     getWidth(), getHeight(),
                     25, 25
                 );
+                g26.dispose();
                 super.paintComponent(g25);
             }
         };
 
-        JDialog category_dialog = new JDialog(
-            transaction_form, 
-            "Select Category" , 
-            true
-        );
         
         CategorySet.setFont(new Font("Segoe UI" , Font.PLAIN, 16));
         CategorySet.setBounds(20, 345, 970, 40);
         CategorySet.setBackground(Color.decode("#E2E8F0"));
         CategorySet.setForeground(Color.decode("#0F172A"));
         CategorySet.setOpaque(false);
+        CategorySet.setEditable(false);
+        CategorySet.setText("");
         CategorySet.setBorder(
             javax.swing.BorderFactory.createEmptyBorder (0, 15, 0 , 15)
         );
-        CategorySet.setEditable(false);
-        CategorySet.setText("");
-        CategorySet.addMouseListener(new MouseAdapter() {
-            @Override 
-            public void mouseClicked(MouseEvent e) {
-                category_dialog.setLocationRelativeTo(transaction_form);
-                category_dialog.setVisible(true);
-            }
-        });
 
+        JDialog category_dialog = new JDialog(
+            transaction_form, 
+            "Select Category" , 
+            true
+        );
 
         category_dialog.setSize(550, 450);
         category_dialog.setLocationRelativeTo(transaction_form);
@@ -603,7 +597,7 @@ public class Money_tracker_organized {
             javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20)
         );
 
-        String[] categories = { 
+        String[] expense_categories = { 
             "Food" , 
             "Transportation" , 
             "Shopping" , 
@@ -613,19 +607,114 @@ public class Money_tracker_organized {
             "Education" , 
             "Others"
         };
-        for (String categoryName : categories) {
-            JButton categoryButton = new JButton(categoryName);
-            categoryButton.setFont(new Font("Segoe UI" , Font.BOLD, 15));
-            categoryButton.setBackground(Color.WHITE);
-            categoryButton.setForeground(Color.decode("#0F172A"));
-            categoryButton.setFocusPainted(false);
-            categoryButton.addActionListener(e -> {
-                CategorySet.setText(categoryName);
-                category_dialog.setVisible(false);
-            });
-            category_panel.add(categoryButton);
-        }
+
+        String[] income_categories = {
+            "Salary" ,
+            "Allowance" , 
+            "Business" , 
+            "Freelance" , 
+            "Gifts" ,
+            "Investments" , 
+            "Refunds" , 
+            "Others"  
+        };
+
+        Runnable updateCategories = () -> {
+            category_panel.removeAll();
+            String[] current_categories;
+
+            if (selected_type[0].equals("INCOME")) {
+                current_categories = income_categories;
+            }
+            else
+            {
+                current_categories = expense_categories;
+            }
+
+            for(String categoryName : current_categories) {
+                JButton categoryButton = new JButton(categoryName) {
+                    @Override 
+                    protected void paintComponent(java.awt.Graphics g) {
+                        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+
+                        g2.setRenderingHint(
+                            java.awt.RenderingHints.KEY_ANTIALIASING, 
+                            java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                        );
+
+                        GradientPaint gradient_category = new GradientPaint (
+                            0, 0, Color.decode("#E8E9FF"), 
+                            getWidth(), getHeight(), Color.decode("#E0E7FF")
+                        );
+
+                        g2.setPaint(gradient_category);
+
+                        g2.fillRoundRect(
+                            1, 1, 
+                            getWidth() -3, 
+                            getHeight() -3, 
+                            25, 25
+                        );
+
+                        g2.setColor(Color.decode("#818CF8"));
+                        g2.setStroke(new java.awt.BasicStroke(1));
+
+                        g2.drawRoundRect(
+                            1, 1, 
+                            getWidth() -3, 
+                            getHeight() -3, 
+                            25, 25
+                        );
+
+                        g2.dispose();
+                        super.paintComponent(g);
+                    }
+                };
+                categoryButton.setFont(new Font("Segoe UI", Font.BOLD, 15));
+                categoryButton.setForeground(Color.decode("#0F172A"));
+                categoryButton.setContentAreaFilled(false);
+                categoryButton.setOpaque(false);
+                categoryButton.setBorderPainted(false);
+                categoryButton.setFocusPainted(false);
+
+                categoryButton.addActionListener(e -> {
+                    CategorySet.setText(categoryName);
+                    System.out.println("Category: " + categoryName);
+                    category_dialog.setVisible(false);
+                });
+                category_panel.add(categoryButton);
+            }
+
+            category_panel.revalidate();
+            category_panel.repaint();
+        };
         category_dialog.setContentPane(category_panel);
+        CategorySet.addMouseListener(new MouseAdapter() {
+            @Override 
+            public void mouseClicked(MouseEvent e) {
+                if (selected_type[0].equals("NONE")) {
+                    JOptionPane.showMessageDialog(
+                        transaction_form, 
+                        "Please select income or expense" , 
+                        "Transaction Type required",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+                updateCategories.run();
+
+                category_dialog.setLocationRelativeTo(transaction_form);
+                category_dialog.setVisible(true);
+            }
+        });
+
+        income_record.addActionListener(e -> {
+            CategorySet.setText("");
+        });
+
+        expense_record.addActionListener(e -> {
+            CategorySet.setText("");
+        });
         
 
          // ----- amount
@@ -718,6 +807,7 @@ public class Money_tracker_organized {
             String description = description_input.getText();
             String amountstr = AmountSet.getText();
             String category = CategorySet.getText();
+            
 
             System.out.println("Description: " + description);
             System.out.println("Amount: " + amountstr);
@@ -777,6 +867,7 @@ public class Money_tracker_organized {
                     description.trim(),
                     category.trim(),
                     money
+    
                 );
 
             // SAVE TRANSACTION IN ARRAYLIST
