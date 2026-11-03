@@ -43,5 +43,45 @@ public class Transaction_manager {
     public ArrayList<Transaction> getTransactions() {
         return new ArrayList<>(transactions);
     }
+
+    public boolean deleteTransaction(Transaction transaction) {
+        return transactions.remove(transaction);
+    }
     
+    public boolean editTransaction(Transaction oldTransaction, Transaction updatedTransaction) 
+    {
+        int index = transactions.indexOf(oldTransaction);
+        if (index == -1) {
+            return false;
+        } 
+
+        transactions.set(index, updatedTransaction);
+        return true;
+    }
+    public static void main(String[] args) {
+        Transaction_manager manager = new Transaction_manager();
+
+        Transaction oldTransaction = new Transaction(
+            "EXPENSE" , 
+            "Lunch" , 
+            "Food" , 
+            150.00
+        );
+
+        manager.addTransaction(oldTransaction);
+
+        System.out.println("Before editing: " + manager.getTotalExpenses());
+
+        Transaction updatedTransaction = new Transaction(
+            "EXPENSE" , 
+            "Dinner" , 
+            "Food" , 
+            250.00
+        );
+
+        boolean edited = manager.editTransaction(oldTransaction, updatedTransaction);
+
+        System.out.println("Edited succesfully: " + edited);
+        System.out.println("After editing: " + manager.getTotalExpenses());
+    }
 }
