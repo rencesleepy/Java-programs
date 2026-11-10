@@ -1,8 +1,8 @@
 
 import java.awt.GridLayout;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+import java.sql.Connection; // help to connect java and database
+import java.sql.DriverManager; // create connection
+import java.sql.PreparedStatement; // 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JButton;
