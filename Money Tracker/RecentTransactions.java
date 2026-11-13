@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -26,6 +27,12 @@ public class RecentTransactions {
             description.setForeground(Color.decode("#0F172A"));
             description.setBounds(5, y, 250, 25);
 
+            JLabel category = new JLabel(transaction.category);
+            category.setFont(new Font("Segoe UI" , Font.BOLD, 12));
+            category.setForeground(Color.decode("#64748B"));
+            category.setBounds(5, y + 22, 200, 20);
+            panel.add(category);
+
             JLabel amount = new JLabel(
                 String.format (
                     "%s₱%,.2f" , 
@@ -43,7 +50,7 @@ public class RecentTransactions {
             {
                 amount.setForeground(Color.decode("#DC2626"));
             }
-            amount.setBounds(5, y + 22, 250, 25);
+            amount.setBounds(5, y + 40, 250, 25);
             panel.add(description);
             panel.add(amount);
 
@@ -86,11 +93,148 @@ public class RecentTransactions {
             JTextField edit_category = new JTextField(
                 transaction.category
             );
+            edit_category.setEditable(false);
+
+            String[] income_categories = {
+                "Salary" , 
+                "Allowance" , 
+                "Business" , 
+                "Freelance" , 
+                "Gifts" ,
+                "Investments" , 
+                "Refunds" , 
+                "Others"
+            };
+
+            String[] expense_categories = {
+                "Food" ,
+                "Transportation" , 
+                "Shopping" ,
+                "Bills" , 
+                "Entertainment" , 
+                "Health" , 
+                "Education" , 
+                "Others"
+            };
+
+            JDialog edit_category_dialog = new JDialog(
+                edit_dialog, 
+                "Select category" , 
+                true
+            );
+
+            edit_category_dialog.setSize(500, 450);
+            edit_category_dialog.setLocationRelativeTo(edit_dialog);
+
+            JPanel category_panel = new JPanel(
+                new GridLayout(4, 2, 15, 15)
+            );
+
+            category_panel.setBackground(Color.decode("#F8FAFC"));
+            category_panel.setBorder(
+                javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            );
+
+            edit_category.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override 
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    category_panel.removeAll();
+                    String[] current_categories;
+
+                    if (transaction.type.equalsIgnoreCase("INCOME")) {
+                        current_categories = income_categories;
+                    }
+                    else
+                    {
+                        current_categories = expense_categories;
+                    }
+
+                    for (String categoryName : current_categories) {
+                        JButton categoryButton = new JButton(categoryName);
+                        categoryButton.setFont(
+                            new Font("Segoe UI" , Font.BOLD, 15)
+                        );
+
+                        categoryButton.setBackground(Color.decode("#E8E9FF"));
+                        categoryButton.setForeground(Color.decode("#0F172A"));
+                        categoryButton.setFocusPainted(false);
+                        categoryButton.addActionListener(event -> {
+                            edit_category.setText(categoryName);
+                            edit_category_dialog.setVisible(false);
+                        });
+                        category_panel.add(categoryButton);
+                    }
+                    category_panel.revalidate();
+                    category_panel.repaint();
+
+                    edit_category_dialog.setLocationRelativeTo(edit_dialog);
+                    edit_category_dialog.setVisible(true);
+                }
+            });
+
+            edit_category_dialog.setContentPane(category_panel);
 
             JButton save_change = new JButton("Save changes");
             save_change.setBackground(Color.decode("#4F46E5"));
             save_change.setForeground(Color.WHITE);
             save_change.setFocusPainted(false);
+            save_change.addActionListener(e2 -> { // edit transactions
+                String newDescription = edit_description.getText().trim();
+                String newAmount = edit_amount.getText().trim();
+                String newCategory = edit_category.getText().trim();
+
+                if (newDescription.isEmpty() || newAmount.isEmpty() || newCategory.isEmpty())
+                {
+                    JOptionPane.showMessageDialog(edit_dialog, 
+                        "Please fill all fields" , 
+                        "Input error", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                double money;
+                try 
+                {
+                    money = Transaction_manager.validateAmount(newAmount);
+                }
+                catch (IllegalArgumentException ex)
+                {
+                    JOptionPane.showMessageDialog(
+                        edit_dialog, 
+                        ex.getMessage(), 
+                        "Invalid amount", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                Transaction updatedTransaction = new Transaction (
+                    transaction.type, 
+                    newDescription, 
+                    newCategory, 
+                    money
+                );
+
+                boolean edited = manager.editTransaction(transaction, updatedTransaction);
+
+                if (edited)
+                {
+                    System.out.println("transaction updated successfully");
+
+                    edit_dialog.dispose();
+                    refreshDashboard.run();
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(
+                        edit_amount, 
+                        "transaction not found" , 
+                        "Invalid",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            });
 
             edit_panel.add(description_label);
             edit_panel.add(edit_description);
@@ -112,7 +256,7 @@ public class RecentTransactions {
         deleteButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         deleteButton.setForeground(Color.WHITE);
         deleteButton.setBackground(Color.decode("#DC2626"));
-        deleteButton.setBounds(220, y + 5, 45, 25);
+        deleteButton.setBounds(205, y + 5, 45, 25);
 
         panel.add(deleteButton);
         
@@ -142,12 +286,13 @@ public class RecentTransactions {
                 }
             }
         });
-            y += 55;
-
-            if (y >= panel.getHeight()) {
-                break;
-            }
+            y += 75;
         }
+
+        panel.setPreferredSize(
+            new Dimension(250, Math.max(y, 235))
+        );
+
         panel.revalidate();
         panel.repaint();
     }
