@@ -58,6 +58,54 @@ public class Transaction_manager {
         transactions.set(index, updatedTransaction);
         return true;
     }
+
+    public double getExpenseByCategory(String category) {
+        double total = 0;
+        for (Transaction transaction : transactions) {
+            if (transaction.type.equalsIgnoreCase("EXPENSE") && transaction.category.equalsIgnoreCase(category)) 
+            {
+                total += transaction.amount;
+            }
+        }
+        return total;
+    }
+
+    public double getIncomeByCategory(String category) {
+        double total = 0;
+        for (Transaction transaction : transactions) {
+            if (transaction.type.equalsIgnoreCase("INCOME") && transaction.category.equalsIgnoreCase(category))
+            {
+                total += transaction.amount;
+            }
+        }
+        return total;
+    }
+
+    public double getIncomeByCategoryPercentage(String category) {
+        double totalIncome = getTotalIncome();
+        if(totalIncome == 0) {
+            return 0;
+        }
+
+        double categoryIncome = getIncomeByCategory(category);
+        return (categoryIncome / totalIncome) * 100;
+    }
+
+    public double getCategoryByPercentage(String category) {
+        double totalExpenses = getTotalExpenses();
+        if (totalExpenses == 0) {
+            return 0;
+        }
+        double categoryExpenses = getExpenseByCategory(category);
+        return (categoryExpenses / totalExpenses) * 100;
+
+        /*
+        formula: percentage = category expenses * 100 
+                              total expenses
+        
+        */
+    }
+
     public static void main(String[] args) {
         Transaction_manager manager = new Transaction_manager();
 
