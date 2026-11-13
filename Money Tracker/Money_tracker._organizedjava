@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.GridLayout;
@@ -10,7 +11,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 
 public class Money_tracker_organized {
     public static void main(String[] args) {
@@ -18,6 +22,7 @@ public class Money_tracker_organized {
         //connector
         Transaction_manager manager = new Transaction_manager();
         final String[] selected_type = {"NONE"};
+        final String[] selected_chart = {"EXPENSE"};
 
         // 1. MAIN WINDOW
         JFrame MAIN_INTERFACE = new JFrame();
@@ -197,40 +202,204 @@ public class Money_tracker_organized {
 
         // 6. LOWER PANELS
 
+
         JPanel spending_chart = new JPanel() {
-            @Override 
+
+            @Override
             protected void paintComponent(java.awt.Graphics g) {
                 super.paintComponent(g);
 
-                java.awt.Graphics2D g2 = 
-                (java.awt.Graphics2D) g.create();
+                java.awt.Graphics2D g2 =
+                    (java.awt.Graphics2D) g.create();
+
                 g2.setRenderingHint(
                     java.awt.RenderingHints.KEY_ANTIALIASING,
                     java.awt.RenderingHints.VALUE_ANTIALIAS_ON
                 );
-                int[] percentages = {40, 20, 30, 10}; // pansamantala
-                Color[] colors = { 
+
+                // 1. CHECK SELECTED CHART
+                boolean isIncome = selected_chart[0].equals("INCOME");
+
+                // 2. SELECT CATEGORIES
+                String[] categories;
+
+                if (isIncome) {
+                    categories = new String[] {
+                        "Salary",
+                        "Allowance",
+                        "Business",
+                        "Freelance",
+                        "Gifts",
+                        "Investments",
+                        "Refunds",
+                        "Others"
+                    };
+                } else {
+                    categories = new String[] {
+                        "Food",
+                        "Transportation",
+                        "Shopping",
+                        "Bills",
+                        "Entertainment",
+                        "Health",
+                        "Education",
+                        "Others"
+                    };
+                }
+
+                // 3. CATEGORY COLORS
+                Color[] colors = {
                     Color.decode("#4F46E5"),
                     Color.decode("#F59E0B"),
                     Color.decode("#10B981"),
-                    Color.decode("#F43F5E")
+                    Color.decode("#F43F5E"),
+                    Color.decode("#8B5CF6"),
+                    Color.decode("#06B6D4"),
+                    Color.decode("#EAB308"),
+                    Color.decode("#64748B")
                 };
-                int startAngle = 90;
-                for (int i=0; i < percentages.length; i++) {
-                    int angle = percentages[i] * 300 / 100;
-                    g2.setColor(colors[i]);
-                    g2.fillArc(30, 15, 200, 200, startAngle, -angle);
-                    startAngle -= angle;
+
+                // 4. GET TOTAL AMOUNT
+                double total = isIncome
+                    ? manager.getTotalIncome()
+                    : manager.getTotalExpenses();
+
+                // 5. DRAW DOUGHNUT CHART
+                if (total > 0) {
+
+                    int startAngle = 90;
+                    int previousAngle = 0;
+
+                    for (int i = 0; i < categories.length; i++) {
+
+                        // GET CATEGORY AMOUNT
+                        double categoryAmount = isIncome
+                            ? manager.getIncomeByCategory(categories[i])
+                            : manager.getExpenseByCategory(categories[i]);
+
+                        if (categoryAmount <= 0) {
+                            continue;
+                        }
+
+                        // CALCULATE SEGMENT ANGLE
+                        int endAngle = (int) Math.round(
+                            previousAngle +
+                            (categoryAmount / total) * 360
+                        );
+
+                        int angle = endAngle - previousAngle;
+
+                        // DRAW CATEGORY SEGMENT
+                        g2.setColor(colors[i]);
+
+                        g2.fillArc(
+                            30, 15,
+                            200, 200,
+                            startAngle,
+                            -angle
+                        );
+
+                        startAngle -= angle;
+                        previousAngle = endAngle;
+                    }
+
+                    // 6. DRAW WHITE CENTER
+                    g2.setColor(Color.WHITE);
+
+                    g2.fillOval(
+                        85, 70,
+                        90, 90
+                    );
                 }
-                // hole
-                g2.setColor(Color.WHITE);
-                g2.fillOval(85, 70, 90, 90);
+
                 g2.dispose();
             }
         };
 
+        
+
         spending_chart.setBounds(20, 90, 300, 240);
         spending_chart.setOpaque(false);
+
+        JPanel category_legend = new JPanel();
+        category_legend.setLayout(null);
+        category_legend.setOpaque(false);
+        category_legend.setBounds(320, 100, 320, 220);
+
+        // update category legend
+        Runnable updateLegend = () -> {
+            category_legend.removeAll();
+
+            boolean isIncome = selected_chart[0].equals("INCOME");
+
+            String[] categories = isIncome ? new String[] {
+                "Salary",
+                "Allowance",
+                "Business",
+                "Freelance",
+                "Gifts",
+                "Investments",
+                "Refunds",
+                "Others"
+            } : new String[] {
+                "Food",
+                "Transportation",
+                "Shopping",
+                "Bills",
+                "Entertainment",
+                "Health",
+                "Education",
+                "Others"
+            };
+            Color[] colors = {
+                Color.decode("#4F46E5"),
+                Color.decode("#F59E0B"),
+                Color.decode("#10B981"),
+                Color.decode("#F43F5E"),
+                Color.decode("#8B5CF6"),
+                Color.decode("#06B6D4"),
+                Color.decode("#EAB308"),
+                Color.decode("#64748B"),
+                Color.decode("#1a3357"),
+                Color.decode("#719e67"),
+                Color.decode("#7a6a73")
+            };
+            Double total = isIncome ? manager.getTotalIncome() : manager.getTotalExpenses();
+            int y = 0;
+
+            for (int i=0; i<categories.length; i++) {
+                double categoryAmount = isIncome ? manager.getIncomeByCategory(categories[i]) : manager.getExpenseByCategory(categories[i]);
+                if (categoryAmount <= 0) {
+                    continue;
+                }
+
+                double percentage = (categoryAmount / total) * 100;
+
+                //color category
+                JPanel colorbox = new JPanel();
+                colorbox.setBackground(colors[i]);
+                colorbox.setBounds(5, y + 5, 12, 12);
+
+                JLabel category_name = new JLabel(categories[i]);
+                category_name.setFont(new Font("Segoe UI" , Font.BOLD, 13));
+                category_name.setForeground(Color.decode("#0F172A"));
+                category_name.setBounds(25, y, 150, 22);
+
+                JLabel categoryAmoundLabel = new JLabel(String.format("₱%,.2f (%.1f%%)", categoryAmount, percentage));
+
+                categoryAmoundLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                categoryAmoundLabel.setForeground(Color.decode("#64748B"));
+                categoryAmoundLabel.setBounds(25, y+20, 250, 20);
+
+                category_legend.add(colorbox);
+                category_legend.add(category_name);
+                category_legend.add(categoryAmoundLabel);
+
+                y += 50;
+            }
+            category_legend.revalidate();
+            category_legend.repaint();
+        };
 
         JLabel breakdown_statement = new JLabel("No spending data yet");
         breakdown_statement.setFont(new Font("Segoe UI", Font.PLAIN, 15));
@@ -330,8 +499,58 @@ public class Money_tracker_organized {
         JPanel transaction_list = new JPanel();
         transaction_list.setLayout(null);
         transaction_list.setOpaque(false);
-        transaction_list.setBounds(15, 60, 270, 260);
-        recents.add(transaction_list);
+
+        //scroll
+        JScrollPane transaction_scroll = new JScrollPane(transaction_list);
+        transaction_scroll.setBounds(15, 60, 270, 235);
+        transaction_scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        transaction_scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        transaction_scroll.setBorder(null);
+        transaction_scroll.setOpaque(false);
+        transaction_scroll.getViewport().setOpaque(false);
+        transaction_scroll.getVerticalScrollBar().setUnitIncrement(16);
+
+        JScrollBar vertical_scroll = transaction_scroll.getVerticalScrollBar();
+        vertical_scroll.setPreferredSize(new Dimension(10, 0));
+        vertical_scroll.setUI(new BasicScrollBarUI() {
+            @Override 
+            protected void configureScrollBarColors() {
+                this.thumbColor = Color.decode("#4F46E5");
+                this.trackColor = Color.decode("#EEF2FF");
+            }
+
+            @Override 
+            protected JButton createDecreaseButton(int orientation) {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                return button;
+            }
+
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                return button;
+            }
+
+            @Override 
+            protected void paintThumb(java.awt.Graphics g, javax.swing.JComponent c, java.awt.Rectangle thumbBounds) {
+                java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.decode("#4F46E5"));
+                g2.fillRoundRect(
+                    thumbBounds.x + 1,
+                    thumbBounds.y, 
+                    Math.max(0, thumbBounds.width -2), 
+                    thumbBounds.height, 
+                    10, 10
+                );
+                g2.dispose();
+            }
+        });
+ 
+        recents.add(transaction_scroll);
 
         // 7. ADD TRANSACTION BUTTON
         JButton transaction_process = new JButton("+ Add Transaction") {
@@ -447,7 +666,23 @@ public class Money_tracker_organized {
                     getWidth(), getHeight(),
                     25, 25
                 );
-                super.paintComponent(g17);
+                g18.dispose();  
+                super.paintComponent(g17);       
+
+                if ("INCOME".equals(selected_type[0])) {
+                    java.awt.Graphics2D border = (java.awt.Graphics2D) g17.create();
+                    border.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                    border.setColor(Color.BLUE);
+                    border.setStroke(new java.awt.BasicStroke(3));
+
+                    border.drawRoundRect(2, 2, 
+                        getWidth() -5, 
+                        getHeight() -5, 
+                        25, 25
+                    );
+                    border.dispose();
+                }
+                       
             }
         };
         income_record.setFont(new Font("Segoe UI", Font.BOLD, 15));
@@ -458,11 +693,6 @@ public class Money_tracker_organized {
         income_record.setContentAreaFilled(false);
         income_record.setOpaque(false);
         income_record.setBorderPainted(false);
-        income_record.addActionListener(e -> {
-            selected_type[0] = "INCOME";
-            System.out.println("Selected: " + selected_type[0]);
-
-        });
 
         transactionform_border.add(income_record);
 
@@ -482,7 +712,24 @@ public class Money_tracker_organized {
                     getWidth(), getHeight(), 
                     25, 25
                 );
+
+                g20.dispose();
                 super.paintComponent(g19);
+
+                if ("EXPENSE".equals(selected_type[0]))
+                {
+                    java.awt.Graphics2D border = (java.awt.Graphics2D) g19.create();
+                    border.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                    border.setColor(Color.BLUE);
+                    border.setStroke(new java.awt.BasicStroke(3));
+
+                    border.drawRoundRect(2, 2, 
+                        getWidth() -5, 
+                        getHeight() -5, 
+                        25, 25
+                    );
+                    border.dispose();
+                }
             }
         };
         expense_record.setFont(new Font("Segoe UI" , Font.BOLD, 15));
@@ -492,9 +739,24 @@ public class Money_tracker_organized {
         expense_record.setBounds(510, 80, 490, 45);
         expense_record.setContentAreaFilled(false);
         expense_record.setBorderPainted(false);
+
         expense_record.addActionListener(e -> {
             selected_type[0] = "EXPENSE";
             System.out.println("Selected: " + selected_type[0]);
+            income_record.repaint();
+            expense_record.repaint();
+
+            updateLegend.run();
+        });
+
+        income_record.addActionListener(e -> {
+            selected_type[0] = "INCOME";
+            System.out.println("Selected: " + selected_type[0]);
+
+            income_record.repaint();
+            expense_record.repaint();
+
+            updateLegend.run();
         });
 
         transactionform_border.add(expense_record);
@@ -775,9 +1037,10 @@ public class Money_tracker_organized {
         save_transaction.setBorderPainted(false);
         // REFRESH DASHBOARD
         final Runnable[] refreshDashboard = new Runnable[1];
+        final Runnable[] updateChartVisibility = new Runnable[1];
+        final Runnable[] refreshLegend = new Runnable[1];
 
         refreshDashboard[0] = () -> {
-
             // UPDATE TOTAL BALANCE
             amount.setText(
                 String.format("₱%,.2f", manager.getBalance())
@@ -799,7 +1062,16 @@ public class Money_tracker_organized {
                 manager,
                 refreshDashboard[0]
             );
+
+            if (refreshLegend[0] != null) {
+                refreshLegend[0].run();
+            }
+
+            if (updateChartVisibility[0] != null) {
+                updateChartVisibility[0].run();
+            }
         };
+        refreshLegend[0] = updateLegend;
 
         save_transaction.addActionListener(e -> {
             recent_transactions_statement.setText("");
@@ -858,6 +1130,7 @@ public class Money_tracker_organized {
                         "Invalid Amount",
                         JOptionPane.ERROR_MESSAGE
                     );
+                    
                     return;
                 }
 
@@ -867,7 +1140,6 @@ public class Money_tracker_organized {
                     description.trim(),
                     category.trim(),
                     money
-    
                 );
 
             // SAVE TRANSACTION IN ARRAYLIST
@@ -879,7 +1151,140 @@ public class Money_tracker_organized {
             System.out.println("Total Income: " + manager.getTotalIncome());
             System.out.println("Total Expenses: " + manager.getTotalExpenses());
             System.out.println("Balance: " + manager.getBalance());
+
+            description_input.setText("");
+            AmountSet.setText("");
+            CategorySet.setText("");
+
+            selected_type[0] = "NONE";
+            transaction_form.setVisible(false);
         });
+
+            JButton income_chart = new JButton("INCOME") {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g45) {
+                java.awt.Graphics2D g46 = (java.awt.Graphics2D) g45.create();
+
+                g46.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+
+                g46.setColor(getBackground());
+                g46.fillRoundRect(
+                    0, 0, 
+                    getWidth(), getHeight(), 
+                    25, 25
+                );
+                if ("INCOME".equals(selected_chart[0])) {
+                    g46.setColor(Color.BLUE);
+                    g46.setStroke(new java.awt.BasicStroke(3));
+
+                    g46.drawRoundRect(
+                        2, 2, 
+                        getWidth() -5, 
+                        getHeight() -5,
+                        25, 25
+                    );
+                }
+                    g46.dispose();
+                    super.paintComponent(g45);
+                }
+            };
+
+            income_chart.setFont(new Font("Segoe UI" , Font.PLAIN, 15));
+            income_chart.setBackground(Color.LIGHT_GRAY);
+            income_chart.setBorderPainted(false);
+            income_chart.setContentAreaFilled(false);
+            income_chart.setFocusPainted(false);
+            income_chart.setBounds(20, 65, 130, 25);
+
+            chart.add(income_chart);
+            income_chart.setVisible(false);
+
+        JButton expenses_chart = new JButton("EXPENSES") {
+            @Override 
+            protected void paintComponent(java.awt.Graphics g47) {
+                java.awt.Graphics2D g48 = (java.awt.Graphics2D) g47.create();
+
+                g48.setRenderingHint(
+                    java.awt.RenderingHints.KEY_ANTIALIASING, 
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                );
+
+                g48.setColor(getBackground());
+                g48.fillRoundRect(
+                    0, 0, 
+                    getWidth(), getHeight(), 
+                    25, 25
+                );
+
+                if ("EXPENSE".equals(selected_chart[0])) {
+                    g48.setColor(Color.BLUE);
+                    g48.setStroke(new java.awt.BasicStroke(3));
+
+                    g48.drawRoundRect(
+                        2, 2, 
+                        getWidth() -5, 
+                        getHeight() -5,
+                        25, 25
+                    );
+                }
+
+                    g48.dispose();
+                    super.paintComponent(g47);
+                }  
+            };
+
+            expenses_chart.setFont(new Font("Segoe UI" , Font.PLAIN, 15));
+            expenses_chart.setBackground(Color.LIGHT_GRAY);
+            expenses_chart.setBorderPainted(false);
+            expenses_chart.setContentAreaFilled(false);
+            expenses_chart.setFocusPainted(false);
+            expenses_chart.setBounds(170, 65, 130, 25);
+
+            chart.add(expenses_chart);
+            expenses_chart.setVisible(false);
+            updateChartVisibility[0] = () -> {
+                boolean has_transaction = manager.getTotalIncome() > 0 || manager.getTotalExpenses() > 0;
+
+                income_chart.setVisible(has_transaction);
+                expenses_chart.setVisible(has_transaction);
+
+                if (has_transaction) {
+                    breakdown_statement.setText("");
+                }
+                else
+                {
+                    breakdown_statement.setText("No data yet");
+                }
+                spending_chart.repaint();
+            };
+
+            expenses_chart.addActionListener(e -> {
+                selected_chart[0] = "EXPENSE";
+                breakdown.setText("Total spending breakdown");
+
+                expenses_card.repaint();
+                spending_chart.repaint();
+                income_chart.repaint();
+
+                updateLegend.run();
+            });
+
+            income_chart.addActionListener(e -> {
+                selected_chart[0] = "INCOME";
+                breakdown.setText("Total income breakdown");
+
+                expenses_chart.repaint();
+                spending_chart.repaint();
+                income_chart.repaint();
+
+                updateLegend.run();
+            });
+
+            transaction_form.setVisible(false);
+
 
         JButton add_transaction_back = new JButton("← Back") {
             @Override 
@@ -920,25 +1325,44 @@ public class Money_tracker_organized {
         transactionform_border.add(CategorySet);
         transactionform_border.add(save_transaction);
 
-        // 8.2 DONUT
-        
+        // 8.2 donut choices
+
+
+        JButton view_history = new JButton("View all transactions");
+        view_history.setFont(new Font ("Segoe UI" , Font.BOLD, 12));
+        view_history.setBackground(Color.decode("#EEF2FF"));
+        view_history.setForeground(Color.decode("#4F46E5"));
+        view_history.setBorderPainted(false);
+        view_history.setFocusPainted(false);
+        view_history.setBounds(40, 305, 220, 25);
+        view_history.addActionListener(e -> {
+            Transaction_history.show_history(MAIN_INTERFACE, manager);
+        });
 
         // 9. ADD COMPONENTS TO THEIR CONTAINERS
+
+
         box_card.add(total_balance);
         box_card.add(amount);
         box_card.add(available_balance);
+        
         income_card.add(income);
         income_card.add(income_amount);
+
         expenses_card.add(expenses);
         expenses_card.add(expenses_amount);
+
         chart.add(breakdown);
         chart.add(line_1);
         chart.add(breakdown_statement);
         chart.add(spending_chart);
+        chart.add(category_legend);
         chart.setLayout(null);
+        
         recents.add(recent_transactions_statement);
         recents.add(recent_transactions);
         recents.add(line_2);
+        recents.add(view_history);
 
         MAIN_INTERFACE.add(MyWallet);
         MAIN_INTERFACE.add(box_card);
@@ -948,14 +1372,13 @@ public class Money_tracker_organized {
         MAIN_INTERFACE.add(recents);
         MAIN_INTERFACE.add(transaction_process);
 
-        // 10. DISPLAY WINDOW
+        // 10. display winodw
         MAIN_INTERFACE.setVisible(true);
-        for (int i=0; i<5; i++)
-        {
-            System.out.println("SUCCESSFUL EXECUTION!");
-        }
+
+        System.out.println("SUCCESSFUL EXECUTION");
         System.out.println("----------------------");
         System.out.println("--- RECENT ACTIONS --- ");
         System.out.println("----------------------");
     }
 }
+
