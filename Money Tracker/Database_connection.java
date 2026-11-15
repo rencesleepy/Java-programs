@@ -1,37 +1,7 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-//connection to para sa java programs at saka sa SQL database
-//moneytracker -> transaction manager -> transactionDAO -> SQl database
-//may sample test sa baba
-
-public class Database_connection {
-    private static final String URL = System.getenv("URL NITO");
-
-    private static final String USER = System.getenv("USER NAME");
-
-    private static final String PASSWORD = System.getenv("PASSWORD MO");
-
-    public static Connection getConnection() throws SQLException {
-        if (URL == null || USER == null || PASSWORD == null) {
-            throw new SQLException (
-                "Database connection settings missing"
-            );
-        }
-        return DriverManager.getConnection(
-            URL, 
-            USER, 
-            PASSWORD
-        );
-    }
-}
 
 
 
-/*
 
-SAMPLE TEST
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -40,7 +10,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     private static final String URL =
-        "jdbc:oracle:thin:@//localhost:1521/XEPDB1";
+        "jdbc:sqlite:thin:@//localhost:1521/XEPDB1";
 
     private static final String USER =
         "MONEY_TRACKER";
@@ -94,4 +64,4 @@ public class DatabaseConnection {
     }
 }
 
- */
+ 
